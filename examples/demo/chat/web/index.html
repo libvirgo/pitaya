@@ -29,15 +29,23 @@
         },
         methods: {
             sendMessage: function () {
-                console.log(this.inputMessage);
-                starx.notify('room.message', {name: this.nickname, content: this.inputMessage});
+                let encoded = new TextEncoder().encode(this.inputMessage);
+                console.log('encoded:', Array.from(encoded));
+                starx.notify('room.message', {name: this.nickname, content: Array.from(encoded)});
                 this.inputMessage = '';
             }
         }
     });
 
     var onMessage = function (msg) {
-        v.messages.push(msg)
+        let b64Decode = (str) => {
+            return decodeURIComponent(atob(str).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+        };
+        let decoded = b64Decode(msg.content);
+        console.log("receive message: ", decoded);
+        v.messages.push({name:msg.name, content: decoded})
     };
 
     var join = function (data) {

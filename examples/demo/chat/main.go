@@ -10,7 +10,7 @@ import (
 
 	"strings"
 
-	"github.com/topfreegames/pitaya/v3/pkg"
+	pitaya "github.com/topfreegames/pitaya/v3/pkg"
 	"github.com/topfreegames/pitaya/v3/pkg/acceptor"
 	"github.com/topfreegames/pitaya/v3/pkg/component"
 	"github.com/topfreegames/pitaya/v3/pkg/config"
@@ -31,7 +31,7 @@ type (
 	// UserMessage represents a message that user sent
 	UserMessage struct {
 		Name    string `json:"name"`
-		Content string `json:"content"`
+		Content []byte `json:"content"`
 	}
 
 	// NewUser message will be received when new user join room
@@ -96,6 +96,7 @@ func (r *Room) Join(ctx context.Context, msg []byte) (*JoinResponse, error) {
 
 // Message sync last message to all members
 func (r *Room) Message(ctx context.Context, msg *UserMessage) {
+	logger.Log.Info("real content: ", string(msg.Content))
 	err := r.app.GroupBroadcast(ctx, "chat", "room", "onMessage", msg)
 	if err != nil {
 		fmt.Println("error broadcasting message", err)
